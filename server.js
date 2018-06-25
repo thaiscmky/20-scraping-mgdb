@@ -80,7 +80,7 @@ app.get("/articles", function(req, res) {
 app.get("/articles/:id", function(req, res) {
     db.Article.findById(req.params.id)
         .populate('note')
-        .then(article => res.json(article))
+        .then( dbArticle => res.json(dbArticle) )
         .catch(err => res.status(500).json(err));
 });
 
@@ -88,9 +88,7 @@ app.get("/articles/:id", function(req, res) {
 app.post("/articles/:id", function(req, res) {
 
     db.Note.create(req.body)
-        .then(note => {
-          return db.Article.findOneAndUpdate({_id: req.params.id}, {$push: { notes: note._id }}, { new: true});
-        })
+        .then(dbNote =>  db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true }))
         .then(article => res.json(article))
         .catch(err => res.status(500).json(err));
 });
